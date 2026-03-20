@@ -1,0 +1,174 @@
+<rxui:ReactiveWindow
+    x:Class="WindowsDefenderMonitoring.MainWindow"
+    x:TypeArguments="local:MainViewModel"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:rxui="http://reactiveui.net"
+    xmlns:local="clr-namespace:WindowsDefenderMonitoring"
+    Title="Windows Defender Monitoring"
+    Width="1100" Height="750"
+    WindowStartupLocation="CenterScreen"
+    Topmost="True">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="220"/>   <!-- Row 0: Plot -->
+            <RowDefinition Height="Auto"/>  <!-- Row 1: Aggregate stats -->
+            <RowDefinition Height="*"/>     <!-- Row 2: Top grids -->
+            <RowDefinition Height="Auto"/>  <!-- Row 3: Action buttons -->
+            <RowDefinition Height="Auto"/>  <!-- Row 4: ETL Recording -->
+        </Grid.RowDefinitions>
+
+        <!-- Row 0: Scan duration plot -->
+        <ContentControl Grid.Row="0" Content="{Binding PlotControl}"/>
+
+        <!-- Row 1: Aggregated statistics + optional admin restart button -->
+        <Border Grid.Row="1" Background="#F5F5F5" BorderBrush="#DDD" BorderThickness="0,1">
+            <DockPanel Margin="12,4,8,4">
+                <!-- Restart button: only shown when not running as admin -->
+                <Button DockPanel.Dock="Right"
+                        Command="{Binding RestartAsAdminCommand}"
+                        Padding="10,4"
+                        VerticalAlignment="Center">
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsNotRunningAsAdmin}" Value="True">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="{Binding UacShieldIcon}" Width="16" Height="16"
+                               RenderOptions.BitmapScalingMode="HighQuality"
+                               VerticalAlignment="Center"/>
+                        <TextBlock Text="Restart to enable live monitoring"
+                                   Margin="6,0,0,0" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+
+                <TextBlock FontSize="13" VerticalAlignment="Center">
+                    <Run Text="Total scanned time: " FontWeight="SemiBold"/>
+                    <Run Text="{Binding TotalScannedSeconds, StringFormat='{}{0:F2}s', Mode=OneWay}"/>
+                    <Run Text="    ETW events: " FontWeight="SemiBold"/>
+                    <Run Text="{Binding TotalEventsProcessed, StringFormat='{}{0:N0}', Mode=OneWay}"/>
+                </TextBlock>
+            </DockPanel>
+        </Border>
+
+        <!-- Row 2: Top Processes | Top Files -->
+        <Grid Grid.Row="2" Margin="4,4,4,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <GroupBox Grid.Column="0" Header="Top Processes" Margin="4,0,2,4">
+                <DataGrid ItemsSource="{Binding TopProcesses}"
+                          AutoGenerateColumns="False"
+                          IsReadOnly="True"
+                          CanUserAddRows="False"
+                          GridLinesVisibility="Horizontal"
+                          HeadersVisibility="Column">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Process" Binding="{Binding Name}" Width="*"/>
+                        <DataGridTextColumn Header="Total Time"
+                            Binding="{Binding TotalSeconds, StringFormat='{}{0:F2}s'}"
+                            Width="90"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </GroupBox>
+
+            <GroupBox Grid.Column="1" Header="Top Files" Margin="2,0,4,4">
+                <DataGrid ItemsSource="{Binding TopFiles}"
+                          AutoGenerateColumns="False"
+                          IsReadOnly="True"
+                          CanUserAddRows="False"
+                          GridLinesVisibility="Horizontal"
+                          HeadersVisibility="Column">
+                    <DataGrid.Columns>
+                        <DataGridTemplateColumn Header="File Name" Width="*">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding ShortName}"
+                                               ToolTip="{Binding Name}"
+                                               TextTrimming="CharacterEllipsis"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn Header="Total Time"
+                            Binding="{Binding TotalSeconds, StringFormat='{}{0:F2}s'}"
+                            Width="90"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </GroupBox>
+        </Grid>
+
+        <!-- Row 3: Action buttons -->
+        <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="8,4,8,4">
+            <Button Command="{Binding CopyHumanReadableCommand}" Padding="14,6" Margin="0,0,8,0">
+                Copy Human Readable Stats
+            </Button>
+            <Button Command="{Binding CopyJsonCommand}" Padding="14,6" Margin="0,0,8,0">
+                Copy JSON
+            </Button>
+            <Button Command="{Binding ResetCommand}" Padding="14,6">
+                Reset
+            </Button>
+        </StackPanel>
+
+        <!-- Row 4: ETL Recording (collapsible) -->
+        <Expander Grid.Row="4" Header="ETL Recording" Margin="8,0,8,8">
+            <Grid Margin="8,8,8,4">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Left: Start / Stop recording -->
+                <GroupBox Grid.Column="0" Header="Record Session" Margin="0,0,4,0">
+                    <StackPanel Margin="8">
+                        <TextBlock Text="Recording name" Margin="0,0,0,2"/>
+                        <TextBox Text="{Binding RecordingName, UpdateSourceTrigger=PropertyChanged}"
+                                 Margin="0,0,0,8"/>
+                        <StackPanel Orientation="Horizontal">
+                            <Button Command="{Binding StartRecordingCommand}" Padding="14,6" Margin="0,0,8,0">
+                                Start
+                            </Button>
+                            <Button Command="{Binding StopRecordingCommand}" Padding="14,6">
+                                Stop
+                            </Button>
+                        </StackPanel>
+                        <TextBlock Foreground="Red" Margin="0,8,0,0" FontWeight="SemiBold">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsRecording}" Value="True">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                            ● Recording in progress…
+                        </TextBlock>
+                    </StackPanel>
+                </GroupBox>
+
+                <!-- Right: Open saved recording -->
+                <GroupBox Grid.Column="1" Header="Open Recording" Margin="4,0,0,0">
+                    <StackPanel Margin="8" VerticalAlignment="Center">
+                        <Button Command="{Binding OpenEtlFileCommand}" Padding="14,6">
+                            Open Saved Recording…
+                        </Button>
+                        <TextBlock Margin="0,8,0,0" Foreground="Gray" FontSize="11" TextWrapping="Wrap">
+                            Opens an .etl file and replays events. Current stats are reset.
+                        </TextBlock>
+                    </StackPanel>
+                </GroupBox>
+            </Grid>
+        </Expander>
+    </Grid>
+</rxui:ReactiveWindow>
