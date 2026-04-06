@@ -26,4 +26,26 @@
   <ItemGroup>
     <None Include="README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
+
+  <!-- Embed all copy-local DLLs into the EXE as resources (Release only) -->
+  <Target Name="EmbedDependencies" AfterTargets="ResolveAssemblyReferences" Condition="'$(Configuration)' == 'Release'">
+    <ItemGroup>
+      <EmbeddedResource Include="@(ReferenceCopyLocalPaths)" Condition="'%(Extension)' == '.dll'">
+        <Type>Non-Resx</Type>
+        <WithCulture>false</WithCulture>
+        <LogicalName>.\%(ReferenceCopyLocalPaths.DestinationSubDirectory)%(ReferenceCopyLocalPaths.FileName)%(ReferenceCopyLocalPaths.Extension)</LogicalName>
+      </EmbeddedResource>
+    </ItemGroup>
+  </Target>
+
+  <!-- After publish, remove loose DLLs so only the single EXE remains -->
+  <Target Name="CleanupPublishOutput" AfterTargets="Publish" Condition="'$(Configuration)' == 'Release'">
+    <ItemGroup>
+      <PublishedDlls Include="$(PublishDir)**\*.dll" />
+      <PublishedPdbs Include="$(PublishDir)**\*.pdb" />
+    </ItemGroup>
+    <Delete Files="@(PublishedDlls);@(PublishedPdbs)" />
+    <RemoveDir Directories="$(PublishDir)x86" />
+    <RemoveDir Directories="$(PublishDir)amd64" />
+  </Target>
 </Project>

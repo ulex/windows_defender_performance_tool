@@ -73,6 +73,20 @@ public class MainViewModel : ReactiveObject, IDisposable
         set => this.RaiseAndSetIfChanged(ref _recordingName, value);
     }
 
+    private string _snapshotName = "";
+    public string SnapshotName
+    {
+        get => _snapshotName;
+        private set => this.RaiseAndSetIfChanged(ref _snapshotName, value);
+    }
+
+    private string _windowTitle = "Windows Defender Monitoring";
+    public string WindowTitle
+    {
+        get => _windowTitle;
+        private set => this.RaiseAndSetIfChanged(ref _windowTitle, value);
+    }
+
     public bool IsRunningAsAdmin { get; } =
         new WindowsPrincipal(WindowsIdentity.GetCurrent()).IsInRole(WindowsBuiltInRole.Administrator);
 
@@ -94,7 +108,7 @@ public class MainViewModel : ReactiveObject, IDisposable
     public ReactiveCommand<Unit, Unit> OpenEtlFileCommand { get; }
     public ReactiveCommand<Unit, Unit> RestartAsAdminCommand { get; }
 
-    public MainViewModel()
+    public MainViewModel(bool startLiveMonitoring = true)
     {
         _plotter = new Plotter(_eventsRelay.AsObservable());
 
@@ -103,8 +117,17 @@ public class MainViewModel : ReactiveObject, IDisposable
             .ObserveOn(RxApp.MainThreadScheduler)
             .Subscribe(OnEvent);
 
+        // Keep title in sync with snapshot name
+        this.WhenAnyValue(x => x.SnapshotName)
+            .Subscribe(name =>
+            {
+                WindowTitle = string.IsNullOrEmpty(name)
+                    ? "Windows Defender Monitoring"
+                    : $"Windows Defender Monitoring — {name}";
+            });
+
         // Live monitoring requires admin
-        if (IsRunningAsAdmin)
+        if (startLiveMonitoring && IsRunningAsAdmin)
         {
             _liveListener = new EtwListener();
             _liveSubscription = _liveListener.Events.Subscribe(
@@ -239,13 +262,20 @@ public class MainViewModel : ReactiveObject, IDisposable
         };
         if (dialog.ShowDialog() != true) return;
 
+        LoadEtlFile(dialog.FileName);
+    }
+
+    public void LoadEtlFile(string filePath)
+    {
         _fileSubscription?.Dispose();
         _fileRawSubscription?.Dispose();
         _fileListener?.Dispose();
 
         Reset();
 
-        _fileListener = new EtwListener(dialog.FileName);
+        SnapshotName = Path.GetFileName(filePath);
+
+        _fileListener = new EtwListener(filePath);
         _fileSubscription = _fileListener.Events.Subscribe(
             e => _eventsRelay.OnNext(e),
             _ => { });
