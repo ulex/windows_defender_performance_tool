@@ -17,6 +17,7 @@ bld/
 *.suo
 *.userosscache
 *.sln.docstates
+.claude
 
 # Visual Studio Code
 .vscode/
