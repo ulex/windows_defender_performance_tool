@@ -1,50 +1,24 @@
 # Windows Defender Performance Tool
 
-A .NET application that monitors Windows Defender ETW (Event Tracing for Windows) events and visualizes scan durations in real-time using a stacked bar chart.
+A .NET application that monitors Windows Defender ETW events and visualizes
+scan durations in real-time using a stacked bar chart. Can also visualize
+snapshots recorded offline with the
+[`New-MpPerformanceRecording`](https://learn.microsoft.com/en-us/powershell/module/defenderperformance/new-mpperformancerecording?view=windowsserver2025-ps)
+PowerShell cmdlet.
+
+![Screenshot](screenshot.png)
 
 ## Features
 
 - Listens to `Microsoft-Antimalware-Engine/StreamScanRequestTask/Stop` ETW events
 - Displays scan durations per process in a stacked bar chart
-- Shows 16 seconds of historical data, updating every second
-- Auto-elevation to administrator privileges (required for ETW)
+- Drag and drop files or folders onto the window to trigger an immediate scan of the dropped items
+- CSV export when more than one snapshot is dragged to the window
 
-## Build & Publish
+## About scan duration
 
-Build as a single-file executable:
+Windows Defender emits ETW start and stop events per scan operation. The durations shown are therefore wall-clock time, not CPU time - if the OS scheduler preempts the Defender thread in between, the reported duration will exceed the actual CPU time consumed.
 
-```bash
-dotnet publish -c Release
-```
+## License
 
-The output will be at `bin\Release\net48\publish\WindowsDefenderPerformanceTool.exe`
-
-## Installation
-
-Copy the published `WindowsDefenderPerformanceTool.exe` to a folder in your PATH, or create an alias:
-
-```powershell
-# Add to PowerShell profile for easy access
-Set-Alias wdperf "C:\path\to\WindowsDefenderPerformanceTool.exe"
-```
-
-## Usage
-
-Run the executable:
-
-```bash
-WindowsDefenderPerformanceTool.exe
-```
-
-Or if you set up the alias:
-
-```bash
-wdmon
-```
-
-**Note:** Administrator privileges are required. The tool will automatically prompt for elevation if not running as administrator.
-
-## Requirements
-
-- Windows 10/11 (x64)
-- Administrator privileges (for ETW access)
+MIT
