@@ -17,6 +17,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Costura.Fody" Version="5.7.0" PrivateAssets="all" />
+    <PackageReference Include="Fody" Version="6.8.2" PrivateAssets="all" />
     <PackageReference Include="Microsoft.Diagnostics.Tracing.TraceEvent" Version="3.1.16" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="ReactiveUI.WPF" Version="20.1.1" />
@@ -28,18 +30,7 @@
     <None Include="README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
-  <!-- Embed all copy-local DLLs into the EXE as resources (Release only) -->
-  <Target Name="EmbedDependencies" AfterTargets="ResolveAssemblyReferences" Condition="'$(Configuration)' == 'Release'">
-    <ItemGroup>
-      <EmbeddedResource Include="@(ReferenceCopyLocalPaths)" Condition="'%(Extension)' == '.dll'">
-        <Type>Non-Resx</Type>
-        <WithCulture>false</WithCulture>
-        <LogicalName>.\%(ReferenceCopyLocalPaths.DestinationSubDirectory)%(ReferenceCopyLocalPaths.FileName)%(ReferenceCopyLocalPaths.Extension)</LogicalName>
-      </EmbeddedResource>
-    </ItemGroup>
-  </Target>
-
-  <!-- After publish, remove loose DLLs so only the single EXE remains -->
+  <!-- After publish, remove loose DLLs — Costura.Fody has already embedded them in the EXE -->
   <Target Name="CleanupPublishOutput" AfterTargets="Publish" Condition="'$(Configuration)' == 'Release'">
     <ItemGroup>
       <PublishedDlls Include="$(PublishDir)**\*.dll" />
