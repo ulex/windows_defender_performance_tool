@@ -26,5 +26,5 @@ jobs:
       - name: Upload binary to release
         uses: softprops/action-gh-release@v2
         with:
-          files: bin/Release/net48/publish/WindowsDefenderMonitoring.exe
+          files: bin/Release/net48/publish/WindowsDefenderPerformanceTool.exe
           fail_on_unmatched_files: true

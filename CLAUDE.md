@@ -13,7 +13,7 @@ dotnet publish -c Release
 # Output: bin\Release\net48\publish\
 
 # Run (requires administrator privileges — UAC prompt auto-triggered if not elevated)
-./bin/Release/net48/publish/WindowsDefenderMonitoring.exe
+./bin/Release/net48/publish/WindowsDefenderPerformanceTool.exe
 ```
 
 There are no automated tests; verification is manual by running the app and observing ETW events during a Windows Defender scan.

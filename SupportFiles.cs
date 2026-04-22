@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 
-namespace WindowsDefenderMonitoring;
+namespace WindowsDefenderPerformanceTool;
 
 /// <summary>
 /// Manages unpacking of DLLs embedded as resources in the EXE on first run,
@@ -12,7 +12,7 @@ namespace WindowsDefenderMonitoring;
 /// Modeled after PerfView's SupportFiles pattern:
 ///   - .csproj embeds all copy-local DLLs with LogicalName starting with ".\"
 ///   - On startup (before any external assembly loads), call UnpackResourcesIfNeeded()
-///   - Resources are extracted to %APPDATA%\WindowsDefenderMonitoring\VER.x.x.x.x\
+///   - Resources are extracted to %APPDATA%\WindowsDefenderPerformanceTool\VER.x.x.x.x\
 ///   - AppDomain.AssemblyResolve loads managed DLLs from that directory
 ///   - PATH is extended so native DLLs in subdirectories are found
 /// </summary>
@@ -29,7 +29,7 @@ internal static class SupportFiles
                 var version = typeof(SupportFiles).Assembly.GetName().Version!;
                 var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
                 _supportFileDir = Path.Combine(
-                    appData, "WindowsDefenderMonitoring",
+                    appData, "WindowsDefenderPerformanceTool",
                     $"VER.{version.Major}.{version.Minor}.{version.Build}.{version.Revision}");
             }
             return _supportFileDir;

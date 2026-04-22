@@ -19,7 +19,7 @@ using Newtonsoft.Json;
 using ReactiveUI;
 using ScottPlot;
 
-namespace WindowsDefenderMonitoring;
+namespace WindowsDefenderPerformanceTool;
 
 public class MainViewModel : ReactiveObject, IDisposable
 {
@@ -80,7 +80,7 @@ public class MainViewModel : ReactiveObject, IDisposable
         private set => this.RaiseAndSetIfChanged(ref _snapshotName, value);
     }
 
-    private string _windowTitle = "Windows Defender Monitoring";
+    private string _windowTitle = "Windows Defender Performance Tool";
     public string WindowTitle
     {
         get => _windowTitle;
@@ -122,8 +122,8 @@ public class MainViewModel : ReactiveObject, IDisposable
             .Subscribe(name =>
             {
                 WindowTitle = string.IsNullOrEmpty(name)
-                    ? "Windows Defender Monitoring"
-                    : $"Windows Defender Monitoring — {name}";
+                    ? "Windows Defender Performance Tool"
+                    : $"Windows Defender Performance Tool — {name}";
             });
 
         // Live monitoring requires admin

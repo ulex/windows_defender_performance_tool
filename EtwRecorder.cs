@@ -2,11 +2,11 @@ using System;
 using System.IO;
 using Microsoft.Diagnostics.Tracing.Session;
 
-namespace WindowsDefenderMonitoring;
+namespace WindowsDefenderPerformanceTool;
 
 public sealed class EtwRecorder : IDisposable
 {
-    private const string SessionName = "WindowsDefenderMonitoringRecordingSession";
+    private const string SessionName = "WindowsDefenderPerformanceToolRecordingSession";
 
     private TraceEventSession? _session;
 

@@ -8,7 +8,7 @@ using System.Windows.Threading;
 using ScottPlot;
 using ScottPlot.WPF;
 
-namespace WindowsDefenderMonitoring;
+namespace WindowsDefenderPerformanceTool;
 
 public sealed class Plotter : IDisposable
 {

@@ -1,6 +1,6 @@
 using System;
 
-namespace WindowsDefenderMonitoring;
+namespace WindowsDefenderPerformanceTool;
 
 internal static class EtwConstants
 {

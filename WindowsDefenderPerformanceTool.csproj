@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -8,10 +8,11 @@
     <UseWPF>true</UseWPF>
 
     <!-- Package configuration for publishing -->
-    <PackageId>WindowsDefenderMonitoring</PackageId>
+    <AssemblyName>WindowsDefenderPerformanceTool</AssemblyName>
+    <PackageId>WindowsDefenderPerformanceTool</PackageId>
     <Version>1.0.0</Version>
     <Authors>Your Name</Authors>
-    <Description>A Windows Defender ETW monitoring tool that visualizes scan durations in real-time</Description>
+    <Description>A Windows Defender ETW performance tool that visualizes scan durations in real-time</Description>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 

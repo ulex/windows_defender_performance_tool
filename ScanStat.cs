@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 
-namespace WindowsDefenderMonitoring;
+namespace WindowsDefenderPerformanceTool;
 
 public record ScanStat(string Name, double TotalSeconds)
 {

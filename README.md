@@ -1,4 +1,4 @@
-# Windows Defender Monitoring Tool
+# Windows Defender Performance Tool
 
 A .NET application that monitors Windows Defender ETW (Event Tracing for Windows) events and visualizes scan durations in real-time using a stacked bar chart.
 
@@ -17,15 +17,15 @@ Build as a single-file executable:
 dotnet publish -c Release
 ```
 
-The output will be at `bin\Release\net10.0-windows\win-x64\publish\WindowsDefenderMonitoring.exe`
+The output will be at `bin\Release\net48\publish\WindowsDefenderPerformanceTool.exe`
 
 ## Installation
 
-Copy the published `WindowsDefenderMonitoring.exe` to a folder in your PATH, or create an alias:
+Copy the published `WindowsDefenderPerformanceTool.exe` to a folder in your PATH, or create an alias:
 
 ```powershell
 # Add to PowerShell profile for easy access
-Set-Alias wdmon "C:\path\to\WindowsDefenderMonitoring.exe"
+Set-Alias wdperf "C:\path\to\WindowsDefenderPerformanceTool.exe"
 ```
 
 ## Usage
@@ -33,7 +33,7 @@ Set-Alias wdmon "C:\path\to\WindowsDefenderMonitoring.exe"
 Run the executable:
 
 ```bash
-WindowsDefenderMonitoring.exe
+WindowsDefenderPerformanceTool.exe
 ```
 
 Or if you set up the alias:

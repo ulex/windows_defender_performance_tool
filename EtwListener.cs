@@ -6,13 +6,13 @@ using System.Reactive.Subjects;
 using System.Threading;
 using Microsoft.Diagnostics.Tracing;
 using Microsoft.Diagnostics.Tracing.Session;
-using static WindowsDefenderMonitoring.MicrosoftAntimalwareEngineEvents;
+using static WindowsDefenderPerformanceTool.MicrosoftAntimalwareEngineEvents;
 
-namespace WindowsDefenderMonitoring;
+namespace WindowsDefenderPerformanceTool;
 
 public sealed class EtwListener : IDisposable
 {
-    private const string SessionName = "WindowsDefenderMonitoringSession";
+    private const string SessionName = "WindowsDefenderPerformanceToolSession";
 
     private readonly Subject<EventInfo> _eventSubject = new();
     private readonly Subject<long> _rawEventCount = new();

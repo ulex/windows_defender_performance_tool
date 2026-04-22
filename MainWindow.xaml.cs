@@ -5,7 +5,7 @@ using System.Windows;
 using Microsoft.Win32;
 using ReactiveUI;
 
-namespace WindowsDefenderMonitoring;
+namespace WindowsDefenderPerformanceTool;
 
 public partial class MainWindow : ReactiveWindow<MainViewModel>
 {

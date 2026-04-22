@@ -2,7 +2,7 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Windows;
 
-namespace WindowsDefenderMonitoring;
+namespace WindowsDefenderPerformanceTool;
 
 internal static class Program
 {
