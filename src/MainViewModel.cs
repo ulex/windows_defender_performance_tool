@@ -14,6 +14,7 @@ using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 using Microsoft.Win32;
 using Newtonsoft.Json;
 using ReactiveUI;
@@ -38,6 +39,9 @@ public class MainViewModel : ReactiveObject, IDisposable
     private IDisposable? _fileRawSubscription;
     private IDisposable? _statsSubscription;
     private EtwListener? _fileListener;
+    private readonly DispatcherTimer _cpuTimer;
+    private TimeSpan? _cpuKernelBaseline;
+    private TimeSpan? _cpuUserBaseline;
 
     // Stats (accessed only on main thread via ObserveOn)
     private readonly Dictionary<string, double> _processTotals = new();
@@ -57,6 +61,48 @@ public class MainViewModel : ReactiveObject, IDisposable
     {
         get => _totalEventsProcessed;
         private set => this.RaiseAndSetIfChanged(ref _totalEventsProcessed, value);
+    }
+
+    private bool _cpuTimesAvailable;
+    public bool CpuTimesAvailable
+    {
+        get => _cpuTimesAvailable;
+        private set => this.RaiseAndSetIfChanged(ref _cpuTimesAvailable, value);
+    }
+
+    private string _kernelTimeText = "";
+    public string KernelTimeText
+    {
+        get => _kernelTimeText;
+        private set => this.RaiseAndSetIfChanged(ref _kernelTimeText, value);
+    }
+
+    private string _userTimeText = "";
+    public string UserTimeText
+    {
+        get => _userTimeText;
+        private set => this.RaiseAndSetIfChanged(ref _userTimeText, value);
+    }
+
+    private string _totalCpuTimeText = "";
+    public string TotalCpuTimeText
+    {
+        get => _totalCpuTimeText;
+        private set => this.RaiseAndSetIfChanged(ref _totalCpuTimeText, value);
+    }
+
+    private string _cpuStatusMessage = "";
+    public string CpuStatusMessage
+    {
+        get => _cpuStatusMessage;
+        private set => this.RaiseAndSetIfChanged(ref _cpuStatusMessage, value);
+    }
+
+    private string? _cpuStatusTooltip;
+    public string? CpuStatusTooltip
+    {
+        get => _cpuStatusTooltip;
+        private set => this.RaiseAndSetIfChanged(ref _cpuStatusTooltip, value);
     }
 
     private bool _isRecording;
@@ -154,6 +200,11 @@ public class MainViewModel : ReactiveObject, IDisposable
         StopRecordingCommand = ReactiveCommand.Create(StopRecording, canStop);
         OpenEtlFileCommand = ReactiveCommand.Create(OpenEtlFile);
         RestartAsAdminCommand = ReactiveCommand.Create(RestartAsAdmin);
+
+        _cpuTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(2) };
+        _cpuTimer.Tick += (_, __) => PollCpuTimes();
+        _cpuTimer.Start();
+        PollCpuTimes();
     }
 
     private void OnEvent(EventInfo info)
@@ -174,6 +225,42 @@ public class MainViewModel : ReactiveObject, IDisposable
         }
 
         RefreshTopLists();
+    }
+
+    private void PollCpuTimes()
+    {
+        switch (MsMpEngCpuInfo.Query())
+        {
+            case CpuTimesSuccess s:
+                if (_cpuKernelBaseline == null)
+                {
+                    _cpuKernelBaseline = s.KernelTime;
+                    _cpuUserBaseline = s.UserTime;
+                }
+                var kernel = s.KernelTime - _cpuKernelBaseline.Value;
+                var user = s.UserTime - _cpuUserBaseline!.Value;
+                KernelTimeText = MsMpEngCpuInfo.FormatTime(kernel);
+                UserTimeText = MsMpEngCpuInfo.FormatTime(user);
+                TotalCpuTimeText = MsMpEngCpuInfo.FormatTime(kernel + user);
+                CpuStatusTooltip = null;
+                CpuTimesAvailable = true;
+                break;
+            case CpuNotRunning:
+                CpuStatusMessage = "Windows Defender is not running";
+                CpuStatusTooltip = null;
+                CpuTimesAvailable = false;
+                break;
+            case CpuAccessDenied:
+                CpuStatusMessage = "Unable to query CPU: access denied";
+                CpuStatusTooltip = null;
+                CpuTimesAvailable = false;
+                break;
+            case CpuError e:
+                CpuStatusMessage = $"Unable to query CPU counters: {e.Message}";
+                CpuStatusTooltip = e.Source.ToString();
+                CpuTimesAvailable = false;
+                break;
+        }
     }
 
     private void RefreshTopLists()
@@ -208,6 +295,9 @@ public class MainViewModel : ReactiveObject, IDisposable
         TopProcesses.Clear();
         TopFiles.Clear();
         _plotter.Reset();
+        _cpuKernelBaseline = null;
+        _cpuUserBaseline = null;
+        PollCpuTimes();
     }
 
     private void CopyHumanReadable()
@@ -345,6 +435,7 @@ public class MainViewModel : ReactiveObject, IDisposable
 
     public void Dispose()
     {
+        _cpuTimer.Stop();
         _statsSubscription?.Dispose();
         _liveSubscription?.Dispose();
         _liveRawSubscription?.Dispose();

@@ -53,12 +53,51 @@
                     </StackPanel>
                 </Button>
 
-                <TextBlock FontSize="13" VerticalAlignment="Center">
-                    <Run Text="Total scanned time: " FontWeight="SemiBold"/>
-                    <Run Text="{Binding TotalScannedSeconds, StringFormat='{}{0:F2}s', Mode=OneWay}"/>
-                    <Run Text="    ETW events: " FontWeight="SemiBold"/>
-                    <Run Text="{Binding TotalEventsProcessed, StringFormat='{}{0:N0}', Mode=OneWay}"/>
-                </TextBlock>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock FontSize="13">
+                        <Run Text="Total scanned time: " FontWeight="SemiBold"/>
+                        <Run Text="{Binding TotalScannedSeconds, StringFormat='{}{0:F2}s', Mode=OneWay}"/>
+                        <Run Text="    ETW events: " FontWeight="SemiBold"/>
+                        <Run Text="{Binding TotalEventsProcessed, StringFormat='{}{0:N0}', Mode=OneWay}"/>
+                    </TextBlock>
+
+                    <!-- MsMpEng CPU times (shown when process is running and accessible) -->
+                    <TextBlock FontSize="13" Margin="20,0,0,0">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding CpuTimesAvailable}" Value="True">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                        <Run Text="Kernel Time: " FontWeight="SemiBold"/>
+                        <Run Text="{Binding KernelTimeText, Mode=OneWay}"/>
+                        <Run Text="    User Time: " FontWeight="SemiBold"/>
+                        <Run Text="{Binding UserTimeText, Mode=OneWay}"/>
+                        <Run Text="    Total CPU Time: " FontWeight="SemiBold"/>
+                        <Run Text="{Binding TotalCpuTimeText, Mode=OneWay}"/>
+                    </TextBlock>
+
+                    <!-- Status message (not running / access denied / error) -->
+                    <TextBlock FontSize="13" Margin="20,0,0,0"
+                               Text="{Binding CpuStatusMessage, Mode=OneWay}"
+                               ToolTip="{Binding CpuStatusTooltip, Mode=OneWay}"
+                               Foreground="Gray">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Visible"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding CpuTimesAvailable}" Value="True">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </StackPanel>
             </DockPanel>
         </Border>
 
