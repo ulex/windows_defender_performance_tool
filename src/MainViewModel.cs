@@ -250,11 +250,6 @@ public class MainViewModel : ReactiveObject, IDisposable
                 CpuStatusTooltip = null;
                 CpuTimesAvailable = false;
                 break;
-            case CpuAccessDenied:
-                CpuStatusMessage = "Unable to query CPU: access denied";
-                CpuStatusTooltip = null;
-                CpuTimesAvailable = false;
-                break;
             case CpuError e:
                 CpuStatusMessage = $"Unable to query CPU counters: {e.Message}";
                 CpuStatusTooltip = e.Source.ToString();
