@@ -4,15 +4,15 @@ using System.Runtime.InteropServices;
 
 namespace WindowsDefenderPerformanceTool;
 
-internal abstract record CpuQueryResult;
-internal sealed record CpuTimesSuccess(TimeSpan KernelTime, TimeSpan UserTime) : CpuQueryResult;
-internal sealed record CpuNotRunning() : CpuQueryResult;
-internal sealed record CpuError(string Message, Exception Source) : CpuQueryResult;
+public abstract record CpuQueryResult;
+public sealed record CpuTimesSuccess(TimeSpan KernelTime, TimeSpan UserTime) : CpuQueryResult;
+public sealed record CpuNotRunning() : CpuQueryResult;
+public sealed record CpuError(string Message, Exception Source) : CpuQueryResult;
 
 // Queries MsMpEng.exe CPU times via NtQuerySystemInformation(SystemProcessInformation).
 // This enumerates all processes at the kernel level and returns CPU times without
 // requiring a handle to the target process.
-internal static class MsMpEngCpuInfo
+public static class MsMpEngCpuInfo
 {
     // SYSTEM_INFORMATION_CLASS value 5: returns one SYSTEM_PROCESS_INFORMATION per process.
     // Struct field offsets below are for x64 Windows (which this app requires).

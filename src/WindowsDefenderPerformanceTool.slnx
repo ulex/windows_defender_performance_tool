@@ -1,3 +1,5 @@
 <Solution>
-  <Project Path="WindowsDefenderPerformanceTool.csproj" />
+  <Project Path="WindowsDefenderPerformanceTool/WindowsDefenderPerformanceTool.csproj" />
+  <Project Path="Lib/Lib.csproj" />
+  <Project Path="WindowsDefenderCpuTime/WindowsDefenderCpuTime.csproj" />
 </Solution>

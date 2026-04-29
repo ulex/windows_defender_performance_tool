@@ -21,10 +21,15 @@ jobs:
           dotnet-version: '8.x'
 
       - name: Publish
-        run: dotnet publish src -c Release
+        run: dotnet publish src/WindowsDefenderPerformanceTool -c Release
+
+      - name: Publish WindowsDefenderCpuTime
+        run: dotnet publish src/WindowsDefenderCpuTime -c Release
 
       - name: Upload binary to release
         uses: softprops/action-gh-release@v2
         with:
-          files: src/bin/Release/net48/publish/WindowsDefenderPerformanceTool.exe
+          files: |
+            src/WindowsDefenderPerformanceTool/bin/Release/net48/publish/WindowsDefenderPerformanceTool.exe
+            src/WindowsDefenderCpuTime/bin/Release/net48/publish/WindowsDefenderCpuTime.exe
           fail_on_unmatched_files: true
