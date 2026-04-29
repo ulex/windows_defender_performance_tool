@@ -158,10 +158,14 @@ public class MainViewModel : ReactiveObject, IDisposable
     {
         _plotter = new Plotter(_eventsRelay.AsObservable());
 
-        // Stats subscription on main thread
+        // Batch events into 250ms windows before dispatching to the UI thread.
+        // Without batching, RefreshTopLists() (O(n log n) sort + ObservableCollection rebuild)
+        // fires for every event, overwhelming the dispatcher queue under heavy scan load.
         _statsSubscription = _eventsRelay
+            .Buffer(TimeSpan.FromMilliseconds(250))
+            .Where(batch => batch.Count > 0)
             .ObserveOn(RxApp.MainThreadScheduler)
-            .Subscribe(OnEvent);
+            .Subscribe(OnEventBatch);
 
         // Keep title in sync with snapshot name
         this.WhenAnyValue(x => x.SnapshotName)
@@ -207,23 +211,26 @@ public class MainViewModel : ReactiveObject, IDisposable
         PollCpuTimes();
     }
 
-    private void OnEvent(EventInfo info)
+    private void OnEventBatch(IList<EventInfo> batch)
     {
-        _totalScannedMs += info.DurationMsec;
+        foreach (var info in batch)
+        {
+            _totalScannedMs += info.DurationMsec;
+
+            if (!string.IsNullOrEmpty(info.Process))
+            {
+                _processTotals.TryGetValue(info.Process, out var existing);
+                _processTotals[info.Process] = existing + info.DurationMsec;
+            }
+
+            if (!string.IsNullOrEmpty(info.FilePath))
+            {
+                _fileTotals.TryGetValue(info.FilePath, out var existing);
+                _fileTotals[info.FilePath] = existing + info.DurationMsec;
+            }
+        }
+
         TotalScannedSeconds = _totalScannedMs / 1000.0;
-
-        if (!string.IsNullOrEmpty(info.Process))
-        {
-            _processTotals.TryGetValue(info.Process, out var existing);
-            _processTotals[info.Process] = existing + info.DurationMsec;
-        }
-
-        if (!string.IsNullOrEmpty(info.FilePath))
-        {
-            _fileTotals.TryGetValue(info.FilePath, out var existing);
-            _fileTotals[info.FilePath] = existing + info.DurationMsec;
-        }
-
         RefreshTopLists();
     }
 
