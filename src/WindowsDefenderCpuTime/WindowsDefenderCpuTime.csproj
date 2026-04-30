@@ -5,7 +5,7 @@
     <TargetFramework>net48</TargetFramework>
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
-    <AssemblyName>WindowsDefenderCpuTime</AssemblyName>
+    <AssemblyName>WindowsDefenderPerformanceTool_Light_CpuTimeOnly_TUI</AssemblyName>
     <Version>1.0.0</Version>
   </PropertyGroup>
 

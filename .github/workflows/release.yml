@@ -31,5 +31,5 @@ jobs:
         with:
           files: |
             src/WindowsDefenderPerformanceTool/bin/Release/net48/publish/WindowsDefenderPerformanceTool.exe
-            src/WindowsDefenderCpuTime/bin/Release/net48/publish/WindowsDefenderCpuTime.exe
+            src/WindowsDefenderCpuTime/bin/Release/net48/publish/WindowsDefenderPerformanceTool_Light_CpuTimeOnly_TUI.exe
           fail_on_unmatched_files: true
