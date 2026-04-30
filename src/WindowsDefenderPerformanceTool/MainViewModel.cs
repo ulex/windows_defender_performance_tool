@@ -15,6 +15,7 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
+using Lib;
 using Microsoft.Win32;
 using Newtonsoft.Json;
 using ReactiveUI;
@@ -246,9 +247,9 @@ public class MainViewModel : ReactiveObject, IDisposable
                 }
                 var kernel = s.KernelTime - _cpuKernelBaseline.Value;
                 var user = s.UserTime - _cpuUserBaseline!.Value;
-                KernelTimeText = MsMpEngCpuInfo.FormatTime(kernel);
-                UserTimeText = MsMpEngCpuInfo.FormatTime(user);
-                TotalCpuTimeText = MsMpEngCpuInfo.FormatTime(kernel + user);
+                KernelTimeText = Util.FormatTime(kernel);
+                UserTimeText = Util.FormatTime(user);
+                TotalCpuTimeText = Util.FormatTime(kernel + user);
                 CpuStatusTooltip = null;
                 CpuTimesAvailable = true;
                 break;
