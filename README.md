@@ -23,6 +23,11 @@ via `NtQuerySystemInformation`, which is available to non-admin users.
 
 ![TUI screenshot](.github/tui.png)
 
+## Measuring Windows Defender impact
+
+For more reliable results, perform each measurement after restarting the machine. Windows Defender appears to use
+internal in-memory caches, so repeated measurements without restarting may not show the real impact.
+
 ## About scan duration
 
 Windows Defender emits ETW start and stop events per scan operation. The durations shown are therefore wall-clock time,
